@@ -3,6 +3,7 @@ var dbserver = require('../dao/dbserver')
 var emailserver = require('../dao/emailserver')
 // 注册页面服务
 var signup = require('../server/signup')
+var signin = require('../server/sign')
 
 
 module.exports = function(app) {
@@ -23,5 +24,9 @@ module.exports = function(app) {
   // 用户名或邮箱是否被注册
   app.post('/signup/judge', function (req, res) {
     signup.judgeValue(req, res)
+  })
+  // 登录
+  app.post('/signin/match',function(req,res)  {
+    signin.signIn(req,res)
   })
 }

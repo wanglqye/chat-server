@@ -4,6 +4,8 @@ var bcrypt = require('./bcrypt')
 var dbmodel = require('../model/dbmodel');
 var User = dbmodel.model('User');
 
+var jwt = require('../dao/jwt')
+
 
 
 // 新建用户
@@ -19,14 +21,9 @@ exports.buildUser = function(name,mail,pwd,res) {
   let user = new User(data);
   user.save(function(err,result){
     if(err){
-      // res.send(status:500)
-      // res.sendStatus(500)
-      console.log('baocuola')
-      // res.send({ status: 500 })
+      res.send({ status: 500 })
     }else{
-      // res.send({status:200})
-      console.log('askjdhasjkdhjka')
-      res.sendStatus(200)
+      res.send({status:200})
     }
   })
 }
@@ -41,6 +38,38 @@ exports.countUserValue = function(data,type,res){
       res.send({ status: 500 })
     }else{
       res.send({ status: 200 })
+    }
+  })
+}
+
+// 用户验证
+exports.userMatch = function(data,pwd,res) {
+  let wherestr = {$or:[{'name':data},{'email':data}]}
+  let out = { 'name':1,imgUrl:'1',psw:1}
+  User.find(wherestr,out,function(err,result){
+    if(err){
+      res.send({status:500})
+    }else{
+      if(!result){
+        res.send({ status: 400 })
+      }
+      result.map(function(e){
+        console.log(e)
+        const pwdMatch = bcrypt.verification(pwd,e.psw)
+        if(pwdMatch){
+          let token = jwt.generateToken(e._id)
+          console.log('token',token)
+          let back = {
+            id:e._id,
+            name:e.name,
+            imgUrl:e.imgUrl,
+            token
+          }
+           res.send({ status: 200,back })
+        }else{
+          res.send({ stauts:400})
+        }
+      })
     }
   })
 }

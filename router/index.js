@@ -4,6 +4,8 @@ var emailserver = require('../dao/emailserver')
 // 注册页面服务
 var signup = require('../server/signup')
 var signin = require('../server/sign')
+// 搜索
+const search = require('../server/search')
 
 
 module.exports = function(app) {
@@ -27,6 +29,21 @@ module.exports = function(app) {
   })
   // 登录
   app.post('/signin/match',function(req,res)  {
+    console.log('1////////////////')
     signin.signIn(req,res)
+  })
+  // 搜索用户
+  app.post('/search/user', function (req, res) {
+    search.searchUser(req, res)
+  })
+  // 判断是否为好友
+  app.post('/search/isfriend', function (req, res) {
+    search.isFriend(req, res)
+  })
+  app.post('/search/group', function (req, res) {
+    search.searchGroup(req, res)
+  })
+  app.post('/search/isingroup', function (req, res) {
+    search.isInGroup(req, res)
   })
 }

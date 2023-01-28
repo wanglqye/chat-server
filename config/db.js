@@ -9,4 +9,3 @@ db.once('open', function () {
 })
 
 module.exports = db;
-console.log('???')

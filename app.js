@@ -1,6 +1,8 @@
 // 引入body-parser解析req
 var bodyParser = require('body-parser');
 const express = require('express')
+// 引入token
+const jwt = require('./dao/jwt')
 const app = express()
 const port = 3000
 
@@ -20,6 +22,16 @@ app.use((req, res, next)=> {
     res.header("Access-Control-Allow-Credentials", "true"); // 允许客户端携带证书式访问。保持跨域请求中的Cookie。注意：此处设true时，Access-Control-Allow-Origin的值不能为 '*'
     res.header("Access-control-max-age", 1000); // 设置请求通过预检后多少时间内不再检验，减少预请求发送次数
     next();
+})
+
+// token判断
+app.use(function(req,res,next) {
+  if(typeof req.body.token != 'undefined'){
+    let token = req.body.token;
+    let tokenMatch = jwt.veriftToken(token)
+    console.log('token',token)
+    console.log('tokenMatch',tokenMatch)
+  }
 })
 
 

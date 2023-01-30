@@ -46,11 +46,11 @@ exports.countUserValue = function(data,type,res){
 }
 
 // 用户验证
-exports.userMatch = function(data,pwd,res) {
-  let wherestr = {$or:[{'name':data},{'email':data}]}
+exports.userMatch = function(username,pwd,res) {
+  let wherestr = { $or: [{ 'name': username }, { 'email': username }]}
   let out = { 'name':1,imgUrl:'1',psw:1}
   User.find(wherestr,out,function(err,result){
-    console.log('result1', result, err, pwd)
+    // console.log('result1', result, err, pwd)
     if(err){
       res.send({status:500})
     }else{
@@ -59,7 +59,7 @@ exports.userMatch = function(data,pwd,res) {
           const pwdMatch = bcrypt.verification(pwd, e.psw)
           if(pwdMatch){
             let token = jwt.generateToken(e._id)
-            console.log('token',token)
+            // console.log('token',token)
             let back = {
               id:e._id,
               name:e.name,
@@ -68,11 +68,11 @@ exports.userMatch = function(data,pwd,res) {
             }
              res.send({ status: 200,back })
           }else{
-             res.send({ status: 400 })
+             res.send({ status: 400,error:"用户名或者密码错误" })
           }
         })
       }else{
-        res.send({ status: 400 })
+        res.send({ status: 400, error: "用户名或者密码错误" })
       }
     }
   })
@@ -80,6 +80,7 @@ exports.userMatch = function(data,pwd,res) {
 
 // 搜索用户
 exports.searchUser = function(data,res){
+  // console.log('data',data)
   let wherestr = {}
   if(data == 'hah'){
      wherestr = {};
@@ -115,7 +116,7 @@ exports.isFriend = function (uid,fid,res) {
         res.send({status:400})
       }
     }
-    
+
   })
 }
 

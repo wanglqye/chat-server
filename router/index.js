@@ -28,8 +28,7 @@ module.exports = function(app) {
     signup.judgeValue(req, res)
   })
   // 登录
-  app.post('/signin/match',function(req,res)  {
-    console.log('1////////////////')
+  app.post('/login',function(req,res)  {
     signin.signIn(req,res)
   })
   // 搜索用户

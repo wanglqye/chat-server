@@ -6,12 +6,23 @@ const jwt = require('./dao/jwt')
 const app = express()
 const port = 3000
 
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 
-require('./router/index')(app);
 
-
+// token判断
+// app.use(function (req, res, next) {
+//   console.log('====================================');
+//   console.log(req);
+//   console.log('====================================');
+//   // if (typeof req.body.token != 'undefined') {
+//   //   let token = req.body.token;
+//   //   let tokenMatch = jwt.veriftToken(token)
+//   //   console.log('token', token)
+//   //   console.log('tokenMatch', tokenMatch)
+//   // }
+// })
 
 
 // 配置跨域请求中间件(服务端允许跨域请求)
@@ -24,28 +35,21 @@ app.use((req, res, next)=> {
     next();
 })
 
-// token判断
-app.use(function(req,res,next) {
-  if(typeof req.body.token != 'undefined'){
-    let token = req.body.token;
-    let tokenMatch = jwt.veriftToken(token)
-    console.log('token',token)
-    console.log('tokenMatch',tokenMatch)
-  }
-})
 
 
 // 404
-app.use(function(req,res,next) {
-  let err = new Error('Not Found.~')
-  err.status =  404;
-  next(err)
-})
+// app.use(function(req,res,next) {
+//   let err = new Error('Not Found.~')
+//   err.status =  404;
+//   next(err)
+// })
 
-// 出现错误处理
-app.use(function (req,res,next) {
-  res.status(err.status || 500)
-  res.send(err.message)
-})
+// // 出现错误处理
+// app.use(function (req,res,next) {
+//   res.status(err.status || 500)
+//   res.send(err.message)
+// })
+
+require('./router/index')(app);
 
 app.listen(port, () => console.log('启动啦'))

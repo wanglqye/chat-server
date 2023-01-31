@@ -2,12 +2,12 @@
 var bcrypt = require('./bcrypt')
 
 var dbmodel = require('../model/dbmodel');
-var User = dbmodel.model('User');
-let Friend = dbmodel.model('Friend')
-let Group = dbmodel.model('Group')
-let GroupMember = dbmodel.model('GroupMember')
+const Friend = require("../model/friendModel")
+const User = require('../model/userModel')
+const Group = require('../model/groupModel')
+const GroupMember = dbmodel.model('GroupMember')
 
-var jwt = require('../dao/jwt')
+const jwt = require('../dao/jwt')
 
 
 
@@ -79,8 +79,10 @@ exports.userMatch = function(username,pwd,res) {
 }
 
 // 搜索用户
-exports.searchUser = function(data,res){
-  // console.log('data',data)
+exports.searchUser = function(token,data,res){
+  // console.log('data',token)
+  let resToken = jwt.verifyToken(token)
+  console.log('resToken',resToken)
   let wherestr = {}
   if(data == 'hah'){
      wherestr = {};
@@ -92,11 +94,13 @@ exports.searchUser = function(data,res){
     'email':1,
     'imgUrl':1
   }
+  let result = Friend.findOne({ userID: resToken.id })
+  console.log('result',result)
   User.find(wherestr,out,function(err,result){
     if(err){
       res.send({ status :500})
     }else{
-      res.send({status:200,result})
+      res.send({status:200,data:result})
     }
   })
 }

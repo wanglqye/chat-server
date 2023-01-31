@@ -4,17 +4,17 @@ var Schema = mongoose.Schema;
 
 
 // 用户表
-var UserSchema = new Schema({
-  name: { type: String },
-  psw: { type: String },
-  email: { type: String },
-  sex: { type: String,default:'asexual' },   //性别
-  brith: { type: Date },
-  phone: { type: Number },
-  explain: { type: String }, //介绍
-  imgUrl: { type: String, default:'user.png'}, //头像
-  time: { type: Date },   //注册时间
-})
+// var UserSchema = new Schema({
+//   name: { type: String },
+//   psw: { type: String },
+//   email: { type: String },
+//   sex: { type: String,default:'asexual' },   //性别
+//   brith: { type: Date },
+//   phone: { type: Number },
+//   explain: { type: String }, //介绍
+//   imgUrl: { type: String, default:'user.png'}, //头像
+//   time: { type: Date },   //注册时间
+// })
 
 // 好友表
 var FriendSchema = new Schema({
@@ -63,11 +63,9 @@ var GroupMsgSchema = new Schema({
   time: { type: Date }, //发送时间
 })
 
-module.exports = db.model('User', UserSchema)
+// module.exports = db.model('User', UserSchema)
 module.exports = db.model('Friend', FriendSchema)
 module.exports = db.model('Message', MessageSchema)
 module.exports = db.model('Group', GroupSchema)
 module.exports = db.model('GroupMember', GroupMemberSchema)
 module.exports = db.model('GroupMsg', GroupMsgSchema)
-
-

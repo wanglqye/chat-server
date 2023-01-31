@@ -2,8 +2,9 @@ const dbserver  = require('../dao/dbserver')
 
 // 用户搜索
 exports.searchUser =  function(req,res){
+  let token = req.headers.authorization
   let data = req.body.data;
-  dbserver.searchUser(data,res);
+  dbserver.searchUser(token,data,res);
 }
 
 // 判断是否为好友

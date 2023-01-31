@@ -12,21 +12,21 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 
 // token判断
-// app.use(function (req, res, next) {
-//   console.log('====================================');
-//   console.log(req);
-//   console.log('====================================');
-//   // if (typeof req.body.token != 'undefined') {
-//   //   let token = req.body.token;
-//   //   let tokenMatch = jwt.veriftToken(token)
-//   //   console.log('token', token)
-//   //   console.log('tokenMatch', tokenMatch)
-//   // }
-// })
+app.use(function (req, res, next) {
+    let token = req.headers['authorization'];
+    // let tokenMatch = jwt.verifyToken(token)
+    console.log('..,/,', req.url)
+    if (token || req.url == '/login' || req.url == '/register' || req.url.includes('/upload')){
+      next();
+    }else{
+      res.send({ status: 401, msg: "非法请求" })
+    }
+})
 
 
 // 配置跨域请求中间件(服务端允许跨域请求)
 app.use((req, res, next)=> {
+  console.log('???')
     res.header("Access-Control-Allow-Origin", req.headers.origin); // 设置允许来自哪里的跨域请求访问（值为*代表允许任何跨域请求，但是没有安全保证）
     res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS"); // 设置允许接收的请求类型
     res.header("Access-Control-Allow-Headers", "Content-Type,request-origin"); // 设置请求头中允许携带的参数

@@ -13,6 +13,5 @@ exports.generateToken = function(id,res) {
 
 exports.verifyToken = function(e) {
   let payload = jwt.verify(e,secret)
-
   return payload;
 }

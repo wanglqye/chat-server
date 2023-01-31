@@ -36,7 +36,6 @@ app.use((req, res, next)=> {
 })
 
 
-
 // 404
 // app.use(function(req,res,next) {
 //   let err = new Error('Not Found.~')
@@ -51,5 +50,11 @@ app.use((req, res, next)=> {
 // })
 
 require('./router/index')(app);
+// swagger
+// 使用swagger API 文档
+const swaggerInstall = require('./tool/swagger')
+swaggerInstall(app)
+
+
 
 app.listen(port, () => console.log('启动啦'))

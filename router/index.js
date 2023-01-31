@@ -9,9 +9,6 @@ const search = require('../server/search')
 
 
 module.exports = function(app) {
-  app.get('/est', (req, res) => {
-    dbserver.findUser(res)
-  })
 
   app.post('/mails', (req, res) => {
     // console.log('mail', req.body.mail)
@@ -28,7 +25,43 @@ module.exports = function(app) {
     signup.judgeValue(req, res)
   })
   // 登录
+  /**,
+   * @swagger
+   * /login: #一定要写完整路径 我使用路由中间件的时候 加了api前缀
+   *    post:
+   *      description: 应用登录接口
+   *      tags: [用户登录]
+   *      summary: 应用登录接口 #这个接口的提示
+   *      produces:
+   *      - application/json #返回类型
+   *      requestBody:    #编写参数接收体
+   *          required: true  #是否必传
+   *          content:
+   *              application/json:
+   *                  schema:     #参数备注
+   *                      type: object    #参数类型
+   *                      properties:
+   *                          username:
+   *                                  type: string    #参数类型
+   *                                  description: 用户名/邮箱     #参数描述
+   *                          pwd:
+   *                                  type: string    #参数类型
+   *                                  description: 密码     #参数描述
+   *                  example:        #请求参数样例。
+   *                      username: "小王"
+   *                      pwd: "123456"
+   *      responses:
+   *        200:
+   *          description: successful operation
+   *        400:
+   *          description: Invalid ID supplied
+   *        404:
+   *          description: Order not found
+   * */
   app.post('/login',function(req,res)  {
+    console.log('====================================');
+    console.log(req.body);
+    console.log('====================================');
     signin.signIn(req,res)
   })
   // 搜索用户
@@ -45,4 +78,38 @@ module.exports = function(app) {
   app.post('/search/isingroup', function (req, res) {
     search.isInGroup(req, res)
   })
+
+
+  /**,
+   * @swagger
+   * /hello: #一定要写完整路径 我使用路由中间件的时候 加了api前缀
+   *    get:
+   *      tags: #分类
+   *      - 测试
+   *      summary: 提交考试答案 #这个接口的提示
+   *      produces:
+   *      - application/json #返回类型
+   *      parameters: #参数以及参数类型
+   *      - name: name
+   *        in: query
+   *        description: 姓名
+   *        required: false
+   *        type: integer
+   *      responses:
+   *        200:
+   *          description: successful operation
+   *        400:
+   *          description: Invalid ID supplied
+   *        404:
+   *          description: Order not found
+   * */
+
+  app.get("/hello", (req, res) => {
+    const name = req.query.name;
+    res.send({
+      hello: `hello`
+    });
+  });
+
+
 }

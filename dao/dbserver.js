@@ -51,7 +51,7 @@ exports.countUserValue = function(data,type,res){
 // 用户验证
 exports.userMatch = function(username,pwd,res) {
   let wherestr = { $or: [{ 'name': username }, { 'email': username }]}
-  let out = { 'name':1,imgUrl:'1',psw:1}
+  let out = { name:1,imgUrl:1,pwd:1}
   User.find(wherestr,out,function(err,result){
     // console.log('result1', result, err, pwd)
     if(err){
@@ -59,7 +59,7 @@ exports.userMatch = function(username,pwd,res) {
     }else{
       if(result && result.length > 0 ){
         result.map(function (e) {
-          const pwdMatch = bcrypt.verification(pwd, e.psw)
+          const pwdMatch = bcrypt.verification(pwd, e.pwd)
           if(pwdMatch){
             let token = jwt.generateToken(e._id)
             // console.log('token',token)

@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
+const db = require('../config/db');
+
 
 const UserSchema = new mongoose.Schema({
     name: { type: String },
-    psw: { type: String },
+    pwd: { type: String },
     email: { type: String },
     sex: { type: String, default: '男' },   //性别
     brith: { type: Date, default:"2000-1-1" },
@@ -12,4 +14,4 @@ const UserSchema = new mongoose.Schema({
     time: { type: Date },   //注册时间
 })
 
-module.exports = mongoose.model('user', UserSchema)
+module.exports = db.model('user', UserSchema)

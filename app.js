@@ -1,6 +1,8 @@
 // 引入body-parser解析req
 var bodyParser = require('body-parser');
 const express = require('express')
+const path = require('path');
+const fs = require('fs')
 // 引入token
 const jwt = require('./dao/jwt')
 const app = express()
@@ -12,21 +14,19 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 
 // token判断
-app.use(function (req, res, next) {
-    let token = req.headers['authorization'];
-    // let tokenMatch = jwt.verifyToken(token)
-    console.log('..,/,', req.url)
-    if (token || req.url == '/login' || req.url == '/register' || req.url.includes('/upload')){
-      next();
-    }else{
-      res.send({ status: 401, msg: "非法请求" })
-    }
-})
+// app.use(function (req, res, next) {
+//     let token = req.headers['authorization'];
+//     // let tokenMatch = jwt.verifyToken(token)
+//     if (token || req.url == '/login' || req.url == '/register' || req.url.includes('/upload')){
+//       next();
+//     }else{
+//       res.send({ status: 401, msg: "非法请求" })
+//     }
+// })
 
 
 // 配置跨域请求中间件(服务端允许跨域请求)
 app.use((req, res, next)=> {
-  console.log('???')
     res.header("Access-Control-Allow-Origin", req.headers.origin); // 设置允许来自哪里的跨域请求访问（值为*代表允许任何跨域请求，但是没有安全保证）
     res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS"); // 设置允许接收的请求类型
     res.header("Access-Control-Allow-Headers", "Content-Type,request-origin"); // 设置请求头中允许携带的参数
@@ -49,7 +49,12 @@ app.use((req, res, next)=> {
 //   res.status(err.status || 500)
 //   res.send(err.message)
 // })
+const routesPath = path.join(__dirname, "routers")
+const files = fs.readdirSync(routesPath)
+for(let file of files){
+  require('./routers/'+file)(app)
+}
 
-require('./router/index')(app);
+// require('./routers/index')(app);
 
 app.listen(port, () => console.log('启动啦111'))

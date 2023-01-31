@@ -4,6 +4,8 @@ var bcrypt = require('./bcrypt')
 var dbmodel = require('../model/dbmodel');
 const Friend = require("../model/friendModel")
 const User = require('../model/userModel')
+// const usermodel = require('../model/dbmodel')
+// const User = usermodel.model('User');
 const Group = require('../model/groupModel')
 const GroupMember = dbmodel.model('GroupMember')
 
@@ -12,18 +14,19 @@ const jwt = require('../dao/jwt')
 
 
 // 新建用户
-exports.buildUser = function(name,mail,pwd,res) {
+exports.buildUser = function(name,email,pwd,res) {
   // 密码加密
   let password = bcrypt.encryption(pwd);
   let data = {
     name:name,
-    email:mail,
-    psw:password,
+    email:email,
+    pwd:password,
     time:new Date(),
   }
   let user = new User(data);
   user.save(function(err,result){
     if(err){
+      console.log(err)
       res.send({ status: 500 })
     }else{
       res.send({status:200})

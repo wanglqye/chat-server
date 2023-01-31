@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const db = require('../config/db');
 
 const FriendSchema = new mongoose.Schema({
     userID: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, //用户id
@@ -8,4 +9,4 @@ const FriendSchema = new mongoose.Schema({
 })
 
 
-module.exports = mongoose.model('friend', FriendSchema)
+module.exports = db.model('friend', FriendSchema)

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const db = require('../config/db');
 
 const GroupSchema = new mongoose.Schema({
     manager: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },            //群主
@@ -13,4 +14,4 @@ const GroupSchema = new mongoose.Schema({
 })
 
 
-module.exports = mongoose.model("group", GroupSchema)
+module.exports = db.model("group", GroupSchema)

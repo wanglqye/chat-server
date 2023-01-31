@@ -1,10 +1,11 @@
 const mongoose = require("mongoose")
+const db = require('../config/db');
 
 const GroupChatSchema = new mongoose.Schema({
     groupID: { type: mongoose.Schema.Types.ObjectId, ref: "group" },
     msg_list:[]
 })
-module.exports = mongoose.model("groupChat", GroupChatSchema);
+module.exports = db.model("groupChat", GroupChatSchema);
 /**
  * msg_list:
  * belong 表示该信息是谁发的,值为用户id

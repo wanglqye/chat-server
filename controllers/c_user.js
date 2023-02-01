@@ -56,10 +56,7 @@ exports.getUserInfo = function(data,res){
 
 // 查找用户
 exports.findUser = function(token,data,res){
-    console.log('微为IE我IE')
     let resToken = jwt.verifyToken(token)
-    console.log('toekn',resToken)
-    console.log('data',data)
     let obj ={}
     // User.findOne({ email: data.email },function(err,result){
     //     if(result){

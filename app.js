@@ -14,15 +14,15 @@ app.use(bodyParser.urlencoded({ extended: false }))
 
 
 // token判断
-// app.use(function (req, res, next) {
-//     let token = req.headers['authorization'];
-//     // let tokenMatch = jwt.verifyToken(token)
-//     if (token || req.url == '/login' || req.url == '/register' || req.url.includes('/upload')){
-//       next();
-//     }else{
-//       res.send({ status: 401, msg: "非法请求" })
-//     }
-// })
+app.use(function (req, res, next) {
+    let token = req.headers['authorization'];
+    // let tokenMatch = jwt.verifyToken(token)
+    if (token || req.url == '/login' || req.url == '/register' || req.url.includes('/upload')){
+      next();
+    }else{
+      res.send({ status: 401, msg: "非法请求" })
+    }
+})
 
 
 // 配置跨域请求中间件(服务端允许跨域请求)

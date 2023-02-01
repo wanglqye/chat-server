@@ -64,7 +64,7 @@ var GroupMsgSchema = new Schema({
 })
 
 // module.exports = db.model('User', UserSchema)
-module.exports = db.model('Friend', FriendSchema)
+// module.exports = db.model('Friend', FriendSchema)
 module.exports = db.model('Message', MessageSchema)
 module.exports = db.model('Group', GroupSchema)
 module.exports = db.model('GroupMember', GroupMemberSchema)

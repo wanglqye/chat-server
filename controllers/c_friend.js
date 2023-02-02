@@ -103,46 +103,76 @@ exports.getRequire = function(token,data,res){
 
 // 处理好友请求
 exports.deal = async function(token,data,res){
-    let resToken = verifyToken(token)
+    let tokenRes = verifyToken(token)
     //通知
     let notifyResult = null;
     let notifyRes = await Notify.findOne({ userID:data.applyId})
     if (notifyRes) {
         // 更新通知表
-        console.log('!')
         notifyResult = await Notify.updateOne({
             "userID": data.applyId
-        }, { $push: { "notify_list": { "operaUser": resToken.id, "operation": data.operation, "genre": "application", "unRead": false, "date": new Date() } } })
+        }, { $push: { "notify_list": { "operaUser": tokenRes.id, "operation": data.operation, "genre": "application", "unRead": false, "date": new Date() } } })
     } else {
-        console.log('?')
         // 创建通知表
         notifyResult = await Notify.create({
             userID: data.applyId,
-            notify_list: [{ "operaUser": resToken.id, "operation": data.operation, "genre": "application", "unRead": false, "date": new Date() }]
+            notify_list: [{ "operaUser": tokenRes.id, "operation": data.operation, "genre": "application", "unRead": false, "date": new Date() }]
         })
     }
     // 关于好友表的操作
     if(data.operation == 'agree'){
-        let table = await Friend.findOne({userID:resToken.id})
+        let table = await Friend.findOne({ userID: tokenRes.id})
         let applyTable = await Friend.findOne({userID:data.applyId})
         let answer = null;
-        console.log('table',table)
-        console.log('applytable',applyTable)
         if(table){
-
+            answer = await Friend.updateOne({ userID: tokenRes.id},
+                {$push:{"friend_list":{user:data.applyId,nickName:data.nickName}}})
+            if (answer.modifiedCount){
+                let sss = await Application.update({ userID: tokenRes.id }, { $pull: { applyList: { applyId } } })
+                answer = {
+                    msg: "已同意该用户的好友请求",
+                    status: 200
+                }
+            }
         }else{
             answer = await Friend.create({
-                userID:resToken.id,
+                userID: tokenRes.id,
                 friend_list:[{
                     "user":data.applyId,
-                    "nickname":"?????"
+                    "nickName":data.nickName
                 }]
             })
             console.log(answer)
-            // if(answer){
-
-            // }
+            if(answer){
+                let ss = await Apply.updateOne({ userID: tokenRes.id }, { $pull: {"applyList":data.applyId}})
+                answer = {
+                    msg:"已同意该用户的好友申请",
+                    status:200
+                }
+            }
         }
+        let tokenUser = User.findOne({ userID: tokenRes.id})
+        if(applyTable){
+            let applyResult = await Friend.updateOne({ userID:data.applyId },{
+                $push:{"friend_list":{user:tokenRes.id,nickName:tokenUser.nickName}},
+            })
+        }else{
+            let c_s = await Friend.create({
+                userID:data.applyId,
+                friend_list:[{
+                    "user":tokenRes.id,
+                    "nickName":tokenUser.nickName
+                }]
+            })
+        }
+
+        res.send(answer)
+    } else{
+        let res = await Apply.updateOne({ userID: tokenRes.id }, { $pull:{'applyList':data.applyId }})
+        res.send({
+            status:200,
+            msg:"已取消好友申请已经拒绝该用户的请求"
+        })
     }
 
 }

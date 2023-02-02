@@ -128,7 +128,7 @@ exports.deal = async function(token,data,res){
             answer = await Friend.updateOne({ userID: tokenRes.id},
                 {$push:{"friend_list":{user:data.applyId,nickName:data.nickName}}})
             if (answer.modifiedCount){
-                let sss = await Application.update({ userID: tokenRes.id }, { $pull: { applyList: { applyId } } })
+                let sss = await Apply.updateOne({ userID: tokenRes.id }, { $pull: { applyList: { applyId:data.applyId } } })
                 answer = {
                     msg: "已同意该用户的好友请求",
                     status: 200
@@ -174,5 +174,34 @@ exports.deal = async function(token,data,res){
             msg:"已取消好友申请已经拒绝该用户的请求"
         })
     }
+
+}
+
+// 获取好友列表
+exports.getFriends = async function(token,data,res){
+    let tokenRes = verifyToken(token);
+    let friend = await Friend.findOne({ userID: tokenRes.id})
+    if(friend){
+        let result = await Friend.findOne({ userID: tokenRes.id }).populate("friend_list")
+        let friendList = result.friend_list
+        let val = {}
+        // 生成大写字母并生成分组对象
+        for (var i = 0; i < 26; i++) {
+            let res = String.fromCharCode(65 + i);
+            val[res] = []
+        }
+         // 将好友昵称文字转为拼音并将放入分组对象中
+        for(let i =0;i<friendList.length;i++){
+            let res = friendList[i].nickName.charAt(0).toUpperCase() + friendList[i].nickName.slice(1)
+            console.log(res)
+            // val[res].push(friendList[i])
+        }
+        console.log(val)
+        res.send({
+            status: 200,
+            data: result
+        })
+    }
+
 
 }

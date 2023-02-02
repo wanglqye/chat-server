@@ -1,4 +1,4 @@
-const { addApply,getRequire,deal } = require('../controllers/c_friend');
+const { addApply, getRequire, deal, getFriends } = require('../controllers/c_friend');
 
 module.exports = function (app) {
     // 添加好友
@@ -20,5 +20,11 @@ module.exports = function (app) {
         let token = req.headers.authorization
         let data = req.body;
         deal(token, data, res)
+    })
+    // 获取好友列表
+    app.get('/friend/getFriendsList', function (req, res) {
+        let token = req.headers.authorization
+        let data = req.query;
+        getFriends(token, data, res)
     })
 }

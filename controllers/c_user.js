@@ -27,8 +27,8 @@ exports.register = function(data,res){
                 if (err) {
                     res.send({ status: 400,msg:'注册失败' })
                 } else {
-                    emailserver.emailSignUp(data.email, res)
-                    // res.send({ status: 200, msg: '注册成功' })
+                    // emailserver.emailSignUp(data.email, res)
+                    res.send({ status: 200, msg: '注册成功' })
                 }
             })
         }

@@ -3,6 +3,8 @@ const Friend = require('../model/friendModel')
 const { verifyToken } =  require('../dao/jwt')
 const Apply = require('../model/applyModel')
 const Notify = require('../model/notifyModel')
+const {chineseToPinYin} = require('../tool/parseChinese')
+
 
 // 发送好友请求
 exports.addApply = function(token,data,res) {
@@ -192,14 +194,27 @@ exports.getFriends = async function(token,data,res){
         }
          // 将好友昵称文字转为拼音并将放入分组对象中
         for(let i =0;i<friendList.length;i++){
-            let res = friendList[i].nickName.charAt(0).toUpperCase() + friendList[i].nickName.slice(1)
-            console.log(res)
-            // val[res].push(friendList[i])
+            let reg = new RegExp("^[a-zA-Z]")  //匹配备注是以字母开头的
+            // let res = friendList[i].nickName.charAt(0).toUpperCase()
+            let initial = null
+            if(reg.test(friendList[i].nickName)){
+                initial = friendList[i].nickName.substring(0, 1)
+            }else{  //备注是中文开头
+                let pinyin = chineseToPinYin(friendList[i].nickName)
+                initial = pinyin.substring(0, 1)
+            }
+            initial = initial.toUpperCase()
+            val[initial].push(friendList[i])
+            console.log(val)
         }
-        console.log(val)
         res.send({
             status: 200,
-            data: result
+            data: val,total:friendList.length,friend_list:friendList
+        })
+    }else{
+        res.send({
+            status:200,
+            data:{},total:0
         })
     }
 

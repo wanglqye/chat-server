@@ -3,6 +3,7 @@ const User = require("../model/userModel")
 const Friend = require("../model/friendModel")
 const emailserver = require('../dao/emailserver')
 const jwt = require('../dao/jwt')
+const {deepClone} = require('../tool/loadsh')
 
 // 注册用户
 exports.register = function(data,res){
@@ -55,9 +56,10 @@ exports.getUserInfo = function(data,res){
 
 
 // 查找用户
-exports.findUser = function(token,data,res){
+exports.findUser = async function(token,data,res){
     let resToken = jwt.verifyToken(token)
     let obj ={}
+    let userFriendList =[]
     // User.findOne({ email: data.email },function(err,result){
     //     if(result){
     //         console.log('result', result)
@@ -73,35 +75,58 @@ exports.findUser = function(token,data,res){
     let wherestr = { $or: [{ name: { $regex: data.searchval } }, { email: { $regex: data.searchval } }] }
     Friend.findOne({userID:resToken.id},function(err,result){
         if (result){
-            let index = result.friend_list.findIndex(item => {
-                console.log('查找好友',obj.id)
-                return item.user == obj.id
-            })
-            if (index >= 0) {
-                obj.isFriend = true
-            } else {
-                obj.isFriend = false
-            }
-        }else{
-            obj.isFriend = false
+            userFriendList = result.friend_list
         }
         // if (tokenUser.email == data.email) {
         //     obj.isFriend = true
         // }
     })
     let out = { name: 1, email: 1, imgUrl: 1 }
-    User.find(wherestr,out,function(err,result){
-        if (err) {
-            res.send({ status: 500 })
-        } else {
-            let newRes = [...result]
-            newRes.forEach(item => {
-                item.isFriend = true
+    // User.find(wherestr,function(err,result){
+    //     let outData;
+    //     let outArr = []
+    //     if (err) {
+    //         res.send({ status: 500 })
+    //     } else {
+    //         console.log('查找用户', result)
+    //         if(userFriendList.length > 0){
+
+    //         }else{
+                
+    //             result.map((item) => {
+    //                 item.isFriend = false
+    //                 outArr.push(item)
+    //             })
+    //             console.log(outArr)
+                
+    //         }
+
+    //         res.send({ status: 200, data: outArr })
+    //     }
+    // })
+    let findRes = await User.find(wherestr)
+    let outData = []
+    if(findRes){
+        // findRes.map(item => {
+        //     item.isFriend ='111'
+        // })
+        let haha = JSON.parse(JSON.stringify(findRes))
+
+          await Promise.all(
+            haha.map(async (item) => {
+              //  let user = await User.findOne({ _id: item.applyId })
+              //  item.avatars = user.imgUrl
+              //  item.name = user.name
+              item.isFriend = 0
+              return item
             })
-            console.log('查找用户', newRes)
+          )
+        //  console.log('hah',haha)
+        // let outData = deepclone(findRes)
+      res.send({ status: 200, data: haha })
 
 
-            res.send({ status: 200, data: newRes })
-        }
-    })
+    }
+    
+    // console.log(findRes)
 }

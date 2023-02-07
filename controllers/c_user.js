@@ -3,7 +3,8 @@ const User = require("../model/userModel")
 const Friend = require("../model/friendModel")
 const emailserver = require('../dao/emailserver')
 const jwt = require('../dao/jwt')
-const {deepClone} = require('../tool/loadsh')
+const { deepClone } = require('../tool/loadsh')
+const _ = require('lodash')
 
 // 注册用户
 exports.register = function(data,res){
@@ -57,76 +58,54 @@ exports.getUserInfo = function(data,res){
 
 // 查找用户
 exports.findUser = async function(token,data,res){
+    console.log('====================================');
+    console.log(data);
+    console.log('====================================');
     let resToken = jwt.verifyToken(token)
     let obj ={}
-    let userFriendList =[]
-    // User.findOne({ email: data.email },function(err,result){
-    //     if(result){
-    //         console.log('result', result)
-    //         obj ={
-    //             _id: result._id,
-    //             name: result.name,
-    //             email: result.email,
-    //             avatars: result.avatars,
-    //             type: "user"
-    //         }
-    //     }
-    // })
+    let userFriendList = []
     let wherestr = { $or: [{ name: { $regex: data.searchval } }, { email: { $regex: data.searchval } }] }
-    Friend.findOne({userID:resToken.id},function(err,result){
-        if (result){
-            userFriendList = result.friend_list
-        }
-        // if (tokenUser.email == data.email) {
-        //     obj.isFriend = true
-        // }
+    // 获取用户的好友列表
+    let userFriendMsg =  await Friend.findOne({userID:resToken.id})
+    // userFriendList = userFriendMsg?.friend_list
+    userFriendMsg?.friend_list.map(item => {
+        userFriendList.push(item.user)
     })
+
+
     let out = { name: 1, email: 1, imgUrl: 1 }
-    // User.find(wherestr,function(err,result){
-    //     let outData;
-    //     let outArr = []
-    //     if (err) {
-    //         res.send({ status: 500 })
-    //     } else {
-    //         console.log('查找用户', result)
-    //         if(userFriendList.length > 0){
+    // 获取搜索结果返回的用户，判断是否为当前用户好友
+    let otherFriends =  await User.find(wherestr,out)
+    let cloneUserList = JSON.parse(JSON.stringify(userFriendList))
+    let cloneSearchRes = JSON.parse(JSON.stringify(otherFriends))
+    cloneSearchRes.map(item => {
+        item.isFriend = 0
+        cloneUserList.map(item2 => {
+            console.log(item._id)
+            console.log(item2)
+            if(item._id.toString() == item2){
+                item.isFriend =1
+            }
+        })
+        return item
+        // if (userFriendList.toString() === item._id.toString()){
+        //     item.isFriend = 1
+        // }
+        // return item;
+    })
+    console.log('otherFriends', cloneSearchRes)
 
-    //         }else{
-                
-    //             result.map((item) => {
-    //                 item.isFriend = false
-    //                 outArr.push(item)
-    //             })
-    //             console.log(outArr)
-                
-    //         }
-
-    //         res.send({ status: 200, data: outArr })
-    //     }
-    // })
-    let findRes = await User.find(wherestr)
-    let outData = []
-    if(findRes){
-        // findRes.map(item => {
-        //     item.isFriend ='111'
-        // })
-        let haha = JSON.parse(JSON.stringify(findRes))
-
-          await Promise.all(
-            haha.map(async (item) => {
-              //  let user = await User.findOne({ _id: item.applyId })
-              //  item.avatars = user.imgUrl
-              //  item.name = user.name
-              item.isFriend = 0
-              return item
-            })
-          )
-        //  console.log('hah',haha)
-        // let outData = deepclone(findRes)
-      res.send({ status: 200, data: haha })
-
-
+    // console.log(userFriendList)
+    if(data.searchval){
+        res.send({
+            status: 200,
+            data: cloneSearchRes
+        })
+    }else{
+        res.send({
+            status: 200,
+            data: []
+        })
     }
-    
-    // console.log(findRes)
+
 }

@@ -69,7 +69,7 @@ exports.userMatch = function(username,pwd,res) {
               imgUrl:e.imgUrl,
               token
             }
-             res.send({ status: 200,back })
+             res.send({ status: 200,back,msg:"登录成功" })
           }else{
              res.send({ status: 400,error:"用户名或者密码错误" })
           }

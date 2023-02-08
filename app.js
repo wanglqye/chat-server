@@ -7,6 +7,11 @@ const fs = require('fs')
 const jwt = require('./dao/jwt')
 const app = express()
 const port = 3008
+const { socketFun } = require('./controllers/socket.js')
+
+// socket.io
+const server = require('http').createServer(app)
+const io = require('socket.io')(server)  //核心，实现客户端之间交互通信
 
 
 app.use(bodyParser.json())
@@ -55,6 +60,21 @@ for(let file of files){
   require('./routers/'+file)(app)
 }
 
+
+
 // require('./routers/index')(app);
 
-app.listen(port, () => console.log('启动啦111'))
+// app.listen(port, () => console.log('启动啦111'))
+server.listen(port, () => console.log('启动啦111'))
+
+
+
+io.on("connection", socket => {
+  console.log('socket连接成功')
+  socketFun(io,socket)
+  // socket.on("qiata",data =>{
+  //   console.log(data)
+  // })
+  // socket.emit("news", { hello: "你好" });
+  // detail(io, socket)
+})

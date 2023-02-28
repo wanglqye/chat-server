@@ -37,8 +37,8 @@ app.all('*', function(req, res, next) {
   if(req.method === "OPTIONS") res.send(200);/*让options请求快速返回*/
   else  next();
 });
- 
- 
+
+
 
 
 // app.use(static('./public'))
@@ -90,7 +90,7 @@ server.listen(port, () => console.log('启动啦1112'))
 
 io.on("connection", socket => {
   console.log('socket连接成功')
-  // socketFun(io,socket)
+  socketFun(io,socket)
   // socket.on("qiata",data =>{
   //   console.log(data)
   // })

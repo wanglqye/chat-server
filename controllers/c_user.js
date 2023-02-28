@@ -39,28 +39,29 @@ exports.register = function(data,res){
 
 
 // 获取用户信息
-exports.getUserInfo = function(data,res){
-    let { id, token } = data;
-    let tokenRes = verifyToken(token)
-    let wherestr = { userID: tokenRes }
-    let user = {}
-    if(id){
-        Friend.findOne(wherestr.populate("friend_list.user"),function(err,result){
-            console.log('err',err)
-            console.log('result',result)
-            if(result){
-                // 后续
-            }
-        })
-    }
+exports.getUserInfo = async function(token,data,res){
+    console.log('data',data)
+    let resToken = jwt.verifyToken(token)
+    let wherestr = { userID: resToken }
+    let user = await User.findOne(wherestr,function(err,result){
+        console.log('err',err,result)
+        if(result){
+            res.send({
+                status:200,
+                data:result
+            })
+        }else{
+            res.send({
+                status: 400,
+                data: {msg:'用户不存在'}
+            })
+        }
+    })
 }
 
 
 // 查找用户
 exports.findUser = async function(token,data,res){
-    console.log('====================================');
-    console.log(data);
-    console.log('====================================');
     let resToken = jwt.verifyToken(token)
     let obj ={}
     let userFriendList = []

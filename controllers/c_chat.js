@@ -1,14 +1,14 @@
 const { verifyToken } = require("../dao/jwt");
 const User = require('../model/userModel')
 const Chat = require('../model/chatModel')
-const Dialogue = reuqire('../model/dialogueModel')
+const Dialogue = require('../model/dialogueModel')
 const GroupChat = require('../model/groupChatModel')
 
 
 // 存储聊天记录
 exports.saveChat = async data => {
     let { id,message,img,token,type,chatType,duration } = data;
-    console.log('存储聊天记录')
+    console.log('存储聊天记录',data)
     let tokenRes = verifyToken(token)
     let user = User.find({_id:tokenRes.id})
     // 私聊
@@ -16,7 +16,7 @@ exports.saveChat = async data => {
         let tokenChat = await Chat.findOne({ fromUser:tokenRes.id, toUser:id })
         let chatRes = ""
         if(tokenChat){
-            let msgList = tokenChat.msgList
+            let msg_list = tokenChat.msg_list
 
               // 防抖 删除录音和图片（超过指定存储时间将自动删除）
             // clearTimeout(timer)
@@ -59,7 +59,7 @@ exports.saveChat = async data => {
             //     }
             // }, time)
 
-            msgList.unshirt({message,img,type,duration,belong:tokenRes.id,date:new Date()})
+            msg_list.unshift({message,img,type,duration,belong:tokenRes.id,date:new Date()})
             chatRes = await Chat.updateOne({
                 fromUser:tokenRes.id, toUser:id
             },{
@@ -147,60 +147,66 @@ exports.saveChat = async data => {
         }
     }else{
         // 群聊
-        let group_chat = await GroupChat.findOne({ groupID: id })
-        let chatRes = null
-        if (group_chat) {
-            let msg_list = group_chat.msg_list
-            msg_list.unshift({ message, img, duration, type, belong: tokenRes.id, date: new Date() })
-            chatRes = await GroupChat.updateOne({
-                groupID: id
-            }, {
-                $set: { msg_list }
-            })
-        } else {
-            chatRes = await GroupChat.create({
-                "groupID": id,
-                "msg_list": [{ message, img, duration, type, "belong": tokenRes.id, "date": new Date() }]
-            })
-        }
+        // let group_chat = await GroupChat.findOne({ groupID: id })
+        // let chatRes = null
+        // if (group_chat) {
+        //     let msg_list = group_chat.msg_list
+        //     msg_list.unshift({ message, img, duration, type, belong: tokenRes.id, date: new Date() })
+        //     chatRes = await GroupChat.updateOne({
+        //         groupID: id
+        //     }, {
+        //         $set: { msg_list }
+        //     })
+        // } else {
+        //     chatRes = await GroupChat.create({
+        //         "groupID": id,
+        //         "msg_list": [{ message, img, duration, type, "belong": tokenRes.id, "date": new Date() }]
+        //     })
+        // }
 
-        if (chatRes.groupID || chatRes.nModified) {
-            // 更新对话信息
-            let group = await Group.findById(id)
-            let user_list = group.user_list
-            let mapRes = await Promise.all(user_list.map(async item => {
+        // if (chatRes.groupID || chatRes.nModified) {
+        //     // 更新对话信息
+        //     let group = await Group.findById(id)
+        //     let user_list = group.user_list
+        //     let mapRes = await Promise.all(user_list.map(async item => {
 
-                let dialogRes = null
-                let dialogToken = await Dialogue.findOne({ userID: item.user })
-                if (dialogToken) {
-                    let chat_list = dialogToken.chat_list
-                    let index = chat_list.findIndex(item => {
-                        return item.id == id
-                    })
-                    if (index >= 0) {
-                        chat_list[index].message = message
-                        chat_list[index].date = new Date()
-                        chat_list[index].msgType = type
-                        chat_list[index].from = user._id
-                        if (tokenRes.id != item.user) {
-                            chat_list[index].unRead = chat_list[index].unRead + 1
-                        }
-                        dialogRes = await Dialogue.updateOne({ "userID": item.user }, { $set: { "chat_list": chat_list } })
-                    } else {
-                        chat_list.unshift({
-                            id, from: user._id, type: chatType, msgType: type, message: message, date: new Date(), unRead: 1
-                        })
-                        dialogRes = await Dialogue.updateOne({ "userID": item.user }, { $set: { "chat_list": chat_list } })
-                    }
-                } else {
-                    dialogRes = await Dialogue.create({
-                        "userID": item.user,
-                        "chat_list": [{ "id": id, "from": user._id, "type": chatType, "msgType": type, "message": message, "date": new Date(), "unRead": 1 }]
-                    })
-                }
-                return item
-            }))
+        //         let dialogRes = null
+        //         let dialogToken = await Dialogue.findOne({ userID: item.user })
+        //         if (dialogToken) {
+        //             let chat_list = dialogToken.chat_list
+        //             let index = chat_list.findIndex(item => {
+        //                 return item.id == id
+        //             })
+        //             if (index >= 0) {
+        //                 chat_list[index].message = message
+        //                 chat_list[index].date = new Date()
+        //                 chat_list[index].msgType = type
+        //                 chat_list[index].from = user._id
+        //                 if (tokenRes.id != item.user) {
+        //                     chat_list[index].unRead = chat_list[index].unRead + 1
+        //                 }
+        //                 dialogRes = await Dialogue.updateOne({ "userID": item.user }, { $set: { "chat_list": chat_list } })
+        //             } else {
+        //                 chat_list.unshift({
+        //                     id, from: user._id, type: chatType, msgType: type, message: message, date: new Date(), unRead: 1
+        //                 })
+        //                 dialogRes = await Dialogue.updateOne({ "userID": item.user }, { $set: { "chat_list": chat_list } })
+        //             }
+        //         } else {
+        //             dialogRes = await Dialogue.create({
+        //                 "userID": item.user,
+        //                 "chat_list": [{ "id": id, "from": user._id, "type": chatType, "msgType": type, "message": message, "date": new Date(), "unRead": 1 }]
+        //             })
+        //         }
+        //         return item
+        //     }))
 
-        }
+        // }
     }
+}
+
+
+// 排序的方法
+function listSort(a, b) {
+    return new Date(a.date).getTime() - new Date(b.date).getTime()
 }

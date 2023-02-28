@@ -1,6 +1,8 @@
 const { verifyToken } = require("../dao/jwt");
 const UserSocket = require('../model/userSocketModel')
 const User = require('../model/userModel')
+const { saveChat } = require('./c_chat')
+
 
 
 
@@ -29,6 +31,9 @@ exports.socketFun = function(io,socket){
 
     // 好友申请通知
     socket.on("deal",async data => {
+        console.log('====================================');
+        console.log('???',data);
+        console.log('====================================');
         let { applyId, operation, token } = data
         let tokenRes = verifyToken(token)
         let user = await User.findOne({_id:tokenRes.id})
@@ -49,7 +54,14 @@ exports.socketFun = function(io,socket){
         if(type == 'text' || type == 'location'){
             // 存储聊天记录
             let res = await saveChat(data)
+
+        }
+        if(chatType == 'private'){  //私聊通知
+            let socketUser = await UserSocket.findOne({userId:id})
+            console.log('socketUser', socketUser)
+            // io.to(socketUser.socketId).emit("UpdateChat", { belong: tokenRes.id, chatType, message, type, date })
         }
 
     })
+
 }

@@ -39,11 +39,11 @@ exports.register = function(data,res){
 
 
 // 获取用户信息
-exports.getUserInfo = async function(token,data,res){
+exports.getUserInfo =  function(token,data,res){
     console.log('data',data)
     let resToken = jwt.verifyToken(token)
     let wherestr = { userID: resToken }
-    let user = await User.findOne(wherestr,function(err,result){
+    let user =  User.findOne(wherestr,function(err,result){
         console.log('err',err,result)
         if(result){
             res.send({
